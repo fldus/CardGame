@@ -18,10 +18,27 @@
     <ClCompile Include="home.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="option.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Font Include="HANDotum.ttf">
       <Filter>리소스 파일</Filter>
     </Font>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="home.h">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="option.h">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -127,10 +127,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="game.cpp" />
     <ClCompile Include="home.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="option.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="HANDotum.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="home.h" />
+    <ClInclude Include="option.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
