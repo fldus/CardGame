@@ -19,23 +19,25 @@ private:
 	Font font;
 	vector<Text> options;
 	bool isOpen = false;
-	int selectedIndex = -1;
-	string selectedbasic;
+	int selectedIndex = 0;	// 첫 번째 옵션 = 기본 선택지
 public:
-	Dropdown(float x, float y,string basic, const vector<string>& optionText) {
+	Dropdown(float x, float y, const vector<string>& optionText) {
+		if (optionText.empty())
+			throw invalid_argument("Option list cannot be empty");
+
 		box.setSize({ 200.f, 50.f });
 		box.setFillColor(Color::White);
 		box.setPosition(x, y);
 
-		font.loadFromFile("HANDotum.ttf");
+		if (!font.loadFromFile("HANDotum.ttf")) {
+			throw runtime_error("Font loading failed");
+		}
 
 		label.setFont(font);
 		label.setCharacterSize(25);
 		label.setFillColor(Color::Black);
-		label.setString(basic);
+		label.setString(optionText[0]);
 		label.setPosition(x + 10.f, y + 10.f);
-
-		selectedbasic = basic;
 
 		for (size_t i = 0; i < optionText.size(); ++i) {
 			Text option;
@@ -61,8 +63,7 @@ public:
 		if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
 			if (box.getGlobalBounds().contains(mousePos)) {
 				isOpen = !isOpen;
-			}
-			else if (isOpen) {
+			}else if (isOpen) {
 				for (size_t i = 0; i < options.size(); ++i) {
 					if (options[i].getGlobalBounds().contains(mousePos)) {
 						selectedIndex = i;
@@ -75,12 +76,6 @@ public:
 		}
 	}
 	string getSelectedOption() const {
-		if (selectedIndex == -1) {
-			for (size_t i = 0; i < options.size(); ++i) {
-				if (options[i].getString() == selectedbasic)
-					selectedIndex = i;
-			}
-		}
 		return options[selectedIndex].getString();
 	}
 };
