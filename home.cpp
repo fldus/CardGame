@@ -1,6 +1,7 @@
-#include <SFML/Graphics.hpp>
+ï»¿#include <SFML/Graphics.hpp>
 #include "home.h"
 #include "option.h"
+#pragma execution_character_set("utf-8")
 
 using namespace sf;
 using namespace std;
@@ -27,7 +28,7 @@ public:
 		font.loadFromFile("HANDotum.ttf");
 		start.setFont(font);
 		start.setCharacterSize(65);
-		start.setString(L"°ÔÀÓ ½ÃÀÛ");
+		start.setString(L"ê²Œì„ ì‹œì‘");
 		start.setFillColor(Color::Black);
 		start.setOrigin(start.getGlobalBounds().width / 2.f, start.getGlobalBounds().height / 1.4f);
 		start.setPosition(shape.getPosition().x, shape.getPosition().y);
@@ -44,7 +45,7 @@ public:
 void showHome()
 {
 	RenderWindow window(VideoMode(App::WIDTH, App::HEIGHT), "Card Game");
-	// ÃÊ´ç ÇÁ·¹ÀÓ Á¶Àı(ÄÄÇ»ÅÍ ¼º´É°ú »ó°ü¾øÀÌ ÀÏÁ¤ÇÑ ¼Óµµ)
+	// ì´ˆë‹¹ í”„ë ˆì„ ì¡°ì ˆ(ì»´í“¨í„° ì„±ëŠ¥ê³¼ ìƒê´€ì—†ì´ ì¼ì •í•œ ì†ë„)
 	window.setFramerateLimit(60);
 
 	StartButton sbutton(App::WIDTH / 2, (App::HEIGHT / 3) * 2);	
@@ -61,6 +62,7 @@ void showHome()
 				if (sbutton.isClicked(mousePos)) {
 					window.close();
 					showOption();
+					return;
 				}
 			}
 		}
