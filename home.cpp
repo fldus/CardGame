@@ -1,7 +1,6 @@
 ﻿#include <SFML/Graphics.hpp>
 #include "home.h"
 #include "option.h"
-#pragma execution_character_set("utf-8")
 
 using namespace sf;
 using namespace std;
@@ -22,10 +21,13 @@ public:
 	StartButton(float x, float y) {
 		shape.setPosition(x, y);
 		shape.setSize({ StartButtonWidth, StartButtonHeight});
-		shape.setFillColor(sf::Color::Yellow);
+		shape.setFillColor(Color(255, 165, 0));
 		shape.setOrigin(StartButtonWidth / 2.f, StartButtonHeight / 2.f);
 
-		font.loadFromFile("HANDotum.ttf");
+		if (!font.loadFromFile("HANDotum.ttf")) {
+			throw runtime_error("Font loading failed");
+		}
+
 		start.setFont(font);
 		start.setCharacterSize(65);
 		start.setString(L"게임 시작");

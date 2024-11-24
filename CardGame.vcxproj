@@ -136,6 +136,7 @@
     <Font Include="HANDotum.ttf" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="game.h" />
     <ClInclude Include="home.h" />
     <ClInclude Include="option.h" />
   </ItemGroup>

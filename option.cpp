@@ -5,7 +5,7 @@
 #include <string>
 #include "option.h"
 #include "home.h"
-#pragma execution_character_set("utf-8")
+#include "game.h"
 
 using namespace sf;
 using namespace std;
@@ -17,8 +17,13 @@ enum App
 
 // UTF-8 -> UTF-16
 std::wstring to_wstring(const std::string& str) {
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-	return converter.from_bytes(str);
+	try{
+		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+		return converter.from_bytes(str);
+	}
+	catch (const std::range_error& e) {
+		throw runtime_error("String conversion failed: " + string(e.what()));
+	}
 }
 
 class Dropdown {
@@ -118,13 +123,50 @@ public:
 	}
 };
 
+class Button {
+private:
+	RectangleShape shape;
+	const float Width = 200.f;
+	const float Height = 50.f;
+	Font font;
+	Text text;
+public:
+	Button(float x, float y, string str, Color color) {
+		shape.setPosition(x, y);
+		shape.setSize({ Width, Height });
+		shape.setFillColor(color);
+
+		if (!font.loadFromFile("HANDotum.ttf")) {
+			throw runtime_error("Font loading failed");
+		}
+
+		text.setFont(font);
+		text.setCharacterSize(25);
+		text.setString(to_wstring(str));
+		text.setFillColor(Color::Black);
+		text.setOrigin(text.getGlobalBounds().width / 2.f, text.getGlobalBounds().height / 1.4f);
+		text.setPosition(
+			shape.getPosition().x + (shape.getSize().x / 2.f),
+			shape.getPosition().y + (shape.getSize().y / 2.f));
+	}
+	void draw(RenderWindow& window) {
+		window.draw(shape);
+		window.draw(text);
+	}
+	bool isClicked(Vector2f mousePos) {
+		return shape.getGlobalBounds().contains(mousePos);
+	}
+};
+
 void showOption() {
 	RenderWindow window(VideoMode(App::WIDTH, App::HEIGHT), "Game Option");
 	window.setFramerateLimit(60);
 
 
-	Dropdown mode = Dropdown((App::WIDTH / 7), App::HEIGHT / 3, "카드", { "기본 카드", "아이템 카드" });
-	Dropdown level = Dropdown((App::WIDTH / 6) * 3, App::HEIGHT / 3, "난이도", {"쉬움", "보통", "어려움"});
+	Dropdown mode = Dropdown(App::WIDTH / 7, App::HEIGHT / 3, u8"카드", { u8"기본 카드", u8"아이템 카드" });
+	Dropdown level = Dropdown(App::WIDTH / 2, App::HEIGHT / 3, u8"난이도", {u8"쉬움", u8"보통", u8"어려움"});
+	Button start = Button(App::WIDTH / 7, (App::HEIGHT / 7) * 5, u8"시작", Color(102, 204, 102));
+	Button cancel = Button(App::WIDTH / 2, (App::HEIGHT / 7)*5, u8"취소", Color(192, 192, 192));
 	
 	while (window.isOpen())
 	{
@@ -137,13 +179,29 @@ void showOption() {
 				showHome();
 				return;
 			}
+
 			mode.handleEvent(event, mousePos);
 			level.handleEvent(event, mousePos);
+
+			if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
+				if (start.isClicked(mousePos)) {
+					window.close();
+					showGame();
+					return;
+				}
+				if (cancel.isClicked(mousePos)) {
+					window.close();
+					showHome();
+					return;
+				}
+			}
 		}
 
 		window.clear(Color::White);
 		mode.draw(window);
 		level.draw(window);
+		start.draw(window);
+		cancel.draw(window);
 		window.display();
 	}
 }
