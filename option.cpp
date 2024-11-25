@@ -118,8 +118,8 @@ public:
 			}
 		}
 	}
-	string getSelectedOption() const {
-		return options[selectedIndex].getString();
+	std::string getSelectedOption() const{
+		return options[selectedIndex].getString().toAnsiString();
 	}
 };
 
@@ -162,7 +162,6 @@ void showOption() {
 	RenderWindow window(VideoMode(App::WIDTH, App::HEIGHT), "Game Option");
 	window.setFramerateLimit(60);
 
-
 	Dropdown mode = Dropdown(App::WIDTH / 7, App::HEIGHT / 3, u8"카드", { u8"기본 카드", u8"아이템 카드" });
 	Dropdown level = Dropdown(App::WIDTH / 2, App::HEIGHT / 3, u8"난이도", {u8"쉬움", u8"보통", u8"어려움"});
 	Button start = Button(App::WIDTH / 7, (App::HEIGHT / 7) * 5, u8"시작", Color(102, 204, 102));
@@ -186,7 +185,7 @@ void showOption() {
 			if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
 				if (start.isClicked(mousePos)) {
 					window.close();
-					showGame();
+					showGame(mode.getSelectedOption(), level.getSelectedOption());
 					return;
 				}
 				if (cancel.isClicked(mousePos)) {

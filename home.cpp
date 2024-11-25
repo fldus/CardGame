@@ -21,7 +21,7 @@ public:
 	StartButton(float x, float y) {
 		shape.setPosition(x, y);
 		shape.setSize({ StartButtonWidth, StartButtonHeight});
-		shape.setFillColor(Color(255, 165, 0));
+		shape.setFillColor(Color(255, 238, 173));
 		shape.setOrigin(StartButtonWidth / 2.f, StartButtonHeight / 2.f);
 
 		if (!font.loadFromFile("HANDotum.ttf")) {
