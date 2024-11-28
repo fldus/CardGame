@@ -15,6 +15,8 @@ class CardGame {
 private:
 	string cardmode;
 	int startlevel;
+	RectangleShape box;
+	
 public:
 	CardGame(const std::string& mode, const std::string& level)
 		: cardmode(mode)
@@ -22,8 +24,19 @@ public:
 		if (level == "쉬움") startlevel = 1;
 		else if (level == "보통") startlevel = 5;
 		else startlevel = 9;
-	}
 
+		box.setSize({ 900.f, 600.f });
+		box.setFillColor(Color::White);
+		box.setOutlineThickness(2.f);
+		box.setOutlineColor(Color::Black);
+		box.setPosition(App::WIDTH / 2 - box.getSize().x / 2, App::HEIGHT / 2 - 250.f);
+
+
+
+	}
+	void draw(RenderWindow& window) {
+		window.draw(box);
+	}
 };
 
 void showGame(const std::string& mode, const std::string& level)
@@ -44,7 +57,7 @@ void showGame(const std::string& mode, const std::string& level)
 			// event
 		}
 		window.clear(Color::White);
-		// class draw
+		cardGame.draw(window);
 		window.display();
 	}
 }
