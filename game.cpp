@@ -407,7 +407,7 @@ public:
 			gameOverWindow.display();
 		}
 	}
-	// 접수 업데이트 함수
+	// 점수 업데이트 함수
 	void updateScore(bool isItem, int startlevel, int level, int cnt) {
 		if (isItem) {	// 아이템 카드일 때 
 			if (startlevel == 1) ie.update(level, cnt);
