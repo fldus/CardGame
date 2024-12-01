@@ -138,8 +138,18 @@ public:
 		float cardWidth = 80.f;
 		float cardHeight = 130.f;
 
-		int colNumber = int(ceil(sqrt(cardNumber)));
-		int rowNumber = int(ceil(float(cardNumber) / colNumber));
+		int colNumber, rowNumber;
+		for (int j = 1; j <= sqrt(cardNumber); ++j) {
+			if (cardNumber % j == 0) {
+				rowNumber = j;
+				colNumber = cardNumber / j;
+			}
+		}
+		if (rowNumber == 0 || colNumber == 0) {
+			rowNumber = ceil(sqrt(cardNumber));
+			colNumber = ceil(float(cardNumber) / rowNumber);
+		}
+
 		float colpadding = (Box::Width - colNumber * cardWidth) / (colNumber + 1.f);
 		float rowpadding = (Box::Height - rowNumber * cardHeight) / (rowNumber + 1.f);
 
