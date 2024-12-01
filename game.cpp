@@ -74,6 +74,7 @@ public:
 
 class CardGame {
 private:
+	int cnt = 0;
 	int level;
 	int startlevel;
 	bool isItem;
@@ -87,6 +88,7 @@ private:
 	vector<Card*> flippedCards;
 	Clock delayClock;
 	Clock clock;
+	float remindTime = 30.f;	// 제한 시간
 	RenderWindow& window;
 public:
 	CardGame(bool Item, int slevel, RenderWindow& renderWindow)
@@ -123,17 +125,18 @@ public:
 		setlevel(level);
 	}
 	void draw() {
-		float second = clock.getElapsedTime().asSeconds();
-		float timerWidth = timerBox.getSize().x * (1 - second / 30.f);
-
-		if (timerWidth < 0) {
-			timerWidth = 0;
+		remindTime -= clock.restart().asSeconds();
+		float timerWidth = timerBox.getSize().x * (remindTime / 30.f);
+		
+		if (timerWidth > timerBox.getSize().x) timerWidth = timerBox.getSize().x;
+		if (remindTime < 0) {
 			GameOver(false);
 		}
 
 		timer.setSize({ timerWidth, timer.getSize().y });
-		if (second >= 20) timer.setFillColor(Color(255, 165, 0));
-		if (second >= 25) timer.setFillColor(Color::Red);
+		if (remindTime > 15) timer.setFillColor(Color(102, 204, 102));
+		if (remindTime <= 15) timer.setFillColor(Color(255, 165, 0));
+		if (remindTime < 5) timer.setFillColor(Color::Red);
 
 		window.draw(text);
 		window.draw(timerBox);
@@ -159,6 +162,8 @@ public:
 	}
 	void setlevel(int level) {
 		text.setString(L" Lv." + to_string(level));
+		remindTime = 30.f;
+		timer.setSize({ timerBox.getSize().x, timerBox.getSize().y });
 		clock.restart();
 		cards.clear();
 
@@ -213,7 +218,7 @@ public:
 	void cardClick(Vector2f mousePos) {
 		if (waiting) return;
 
-		if (clock.getElapsedTime().asSeconds() >= 30) {
+		if (remindTime < 0) {
 			GameOver(false);
 			return;
 		}
@@ -226,16 +231,23 @@ public:
 				if (flippedCards.size() == 2) {
 					waiting = true;
 					if (flippedCards[0]->card_img == flippedCards[1]->card_img) {
+						if (isItem && flippedCards[0]->card_img == 0) {
+							remindTime += 5;
+						}
+						else if (isItem && flippedCards[0]->card_img == 3) {
+							remindTime -= 5;
+						}	
 						flippedCards[0]->isMatched = true;
 						flippedCards[1]->isMatched = true;
 						flippedCards.clear();
+						cnt += 2;
 						waiting = false;
 					}
 					else {
 						delayClock.restart();
 					}
 				}
-				if(clock.getElapsedTime().asSeconds() < 30)
+				if(remindTime > 0)
 					cardCheck();
 				return;
 			}
@@ -284,6 +296,7 @@ public:
 					Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
 					if (next.isClicked(mousePos)) {
 						gameOverWindow.close();
+						updateScore(isItem, startlevel, level, cnt);
 						if (isClear)
 							nextLevel();
 						else {
@@ -293,6 +306,7 @@ public:
 						return;
 					}else if (home.isClicked(mousePos)) {
 						gameOverWindow.close();
+						updateScore(isItem, startlevel, level, cnt);
 						window.close();
 						showHome();
 						return ;
@@ -304,6 +318,18 @@ public:
 			next.draw(gameOverWindow);
 			home.draw(gameOverWindow);
 			gameOverWindow.display();
+		}
+	}
+	void updateScore(bool isItem, int startlevel, int level, int cnt) {
+		if (isItem) {
+			if (startlevel == 1) ie.update(level, cnt);
+			else if (startlevel == 5) ic.update(level, cnt);
+			else ih.update(level, cnt);
+		}
+		else {
+			if (startlevel == 1) be.update(level, cnt);
+			else if (startlevel == 5) bc.update(level, cnt);
+			else bh.update(level, cnt);
 		}
 	}
 };
