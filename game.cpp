@@ -78,6 +78,8 @@ private:
 	int startlevel;
 	bool isItem;
 	bool waiting = false;
+	RectangleShape timerBox;
+	RectangleShape timer;
 	RectangleShape box;
 	Text text;
 	Font font;
@@ -108,14 +110,39 @@ public:
 		text.setString(to_wstring(L" Lv." + to_string(level)));
 		text.setPosition(box.getPosition().x, 40.f);
 
+		timerBox.setSize({ box.getSize().x - text.getGlobalBounds().width - 30.f, 50.f});
+		timerBox.setFillColor(Color::White);
+		timerBox.setOutlineThickness(2.f);
+		timerBox.setOutlineColor(Color::Black);
+		timerBox.setPosition(text.getPosition().x + text.getGlobalBounds().width + 30.f, 50.f);
+
+		timer.setSize({ timerBox.getSize().x, timerBox.getSize().y });
+		timer.setFillColor(Color(102, 204, 102));
+		timer.setPosition(timerBox.getPosition().x, timerBox.getPosition().y);
+
 		setlevel(level);
 	}
 	void draw() {
+		float second = clock.getElapsedTime().asSeconds();
+		float timerWidth = timerBox.getSize().x * (1 - second / 30.f);
+
+		if (timerWidth < 0) {
+			timerWidth = 0;
+			GameOver(false);
+		}
+
+		timer.setSize({ timerWidth, timer.getSize().y });
+		if (second >= 20) timer.setFillColor(Color(255, 165, 0));
+		if (second >= 25) timer.setFillColor(Color::Red);
+
 		window.draw(text);
+		window.draw(timerBox);
+		window.draw(timer);
 		window.draw(box);
 		for (auto& card : cards) {
 			card.draw(window);
 		}
+
 		if (waiting && delayClock.getElapsedTime().asMilliseconds() >= 500) {
 			flippedCards[0]->flip();
 			flippedCards[1]->flip();
@@ -132,6 +159,7 @@ public:
 	}
 	void setlevel(int level) {
 		text.setString(L" Lv." + to_string(level));
+		clock.restart();
 		cards.clear();
 
 		int cardNumber = cardCount(level);
