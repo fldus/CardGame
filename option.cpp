@@ -1,4 +1,5 @@
 ﻿#include <SFML/Graphics.hpp>
+#include <iostream>
 #include <locale>
 #include <codecvt>
 #include <vector>
@@ -108,7 +109,7 @@ public:
 				isOpen = !isOpen;
 			}else if (isOpen) {
 				for (size_t i = 0; i < options.size(); ++i) {
-					if (options[i].getGlobalBounds().contains(mousePos)) {
+					if (optionBoxes[i].getGlobalBounds().contains(mousePos)) {
 						selectedIndex = i;
 						label.setString(options[i].getString());
 						isOpen = false;
@@ -118,8 +119,8 @@ public:
 			}
 		}
 	}
-	std::string getSelectedOption() const{
-		return options[selectedIndex].getString().toAnsiString();
+	const wstring getSelectedOption() const{
+		return options[selectedIndex].getString().toWideString();
 	}
 };
 
@@ -184,6 +185,8 @@ void showOption() {
 
 			if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
 				if (start.isClicked(mousePos)) {
+					wstring selectedMode = mode.getSelectedOption();
+					wstring selectedLevel = level.getSelectedOption();
 					window.close();
 					showGame(mode.getSelectedOption(), level.getSelectedOption());
 					return;

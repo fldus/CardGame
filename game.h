@@ -1,6 +1,9 @@
 #ifndef GAME_H
 #define GAME_H
 
-void showGame(const std::string& mode, const std::string& level);
+#include <string>
+using std::wstring;
+
+void showGame(const wstring& mode, const wstring& level);
 
 #endif
