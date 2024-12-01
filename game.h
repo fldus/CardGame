@@ -4,6 +4,6 @@
 #include <string>
 using std::wstring;
 
-void showGame(const wstring& mode, const wstring& level);
+void showGame(bool isItem, int startlevel);
 
 #endif

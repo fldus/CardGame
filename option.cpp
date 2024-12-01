@@ -124,40 +124,31 @@ public:
 	}
 };
 
-class Button {
-private:
-	RectangleShape shape;
-	const float Width = 200.f;
-	const float Height = 50.f;
-	Font font;
-	Text text;
-public:
-	Button(float x, float y, string str, Color color) {
-		shape.setPosition(x, y);
-		shape.setSize({ Width, Height });
-		shape.setFillColor(color);
+Button::Button(float x, float y, string str, Color color) {
+	shape.setPosition(x, y);
+	shape.setSize({ Width, Height });
+	shape.setFillColor(color);
 
-		if (!font.loadFromFile("HANDotum.ttf")) {
-			throw runtime_error("Font loading failed");
-		}
+	if (!font.loadFromFile("HANDotum.ttf")) {
+		throw runtime_error("Font loading failed");
+	}
 
-		text.setFont(font);
-		text.setCharacterSize(25);
-		text.setString(to_wstring(str));
-		text.setFillColor(Color::Black);
-		text.setOrigin(text.getGlobalBounds().width / 2.f, text.getGlobalBounds().height / 1.4f);
-		text.setPosition(
-			shape.getPosition().x + (shape.getSize().x / 2.f),
-			shape.getPosition().y + (shape.getSize().y / 2.f));
-	}
-	void draw(RenderWindow& window) {
-		window.draw(shape);
-		window.draw(text);
-	}
-	bool isClicked(Vector2f mousePos) {
-		return shape.getGlobalBounds().contains(mousePos);
-	}
-};
+	text.setFont(font);
+	text.setCharacterSize(25);
+	text.setString(to_wstring(str));
+	text.setFillColor(Color::Black);
+	text.setOrigin(text.getGlobalBounds().width / 2.f, text.getGlobalBounds().height / 1.4f);
+	text.setPosition(
+		shape.getPosition().x + (shape.getSize().x / 2.f),
+		shape.getPosition().y + (shape.getSize().y / 2.f));
+}
+void Button::draw(RenderWindow& window) {
+	window.draw(shape);
+	window.draw(text);
+}
+bool Button::isClicked(Vector2f mousePos) {
+	return shape.getGlobalBounds().contains(mousePos);
+}
 
 void showOption() {
 	RenderWindow window(VideoMode(App::WIDTH, App::HEIGHT), "Game Option");
@@ -185,10 +176,15 @@ void showOption() {
 
 			if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
 				if (start.isClicked(mousePos)) {
-					wstring selectedMode = mode.getSelectedOption();
-					wstring selectedLevel = level.getSelectedOption();
+					bool isItem = (mode.getSelectedOption() == L"아이템 카드");
+
+					int selectedLevel;
+					if (level.getSelectedOption() == L"쉬움") selectedLevel = 1;
+					else if (level.getSelectedOption() == L"보통") selectedLevel = 5;
+					else selectedLevel = 9;
+
 					window.close();
-					showGame(mode.getSelectedOption(), level.getSelectedOption());
+					showGame(isItem, selectedLevel);
 					return;
 				}
 				if (cancel.isClicked(mousePos)) {

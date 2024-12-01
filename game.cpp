@@ -1,6 +1,8 @@
 ﻿#include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <random>
 #include "home.h"
 #include "option.h"
 #include "game.h"
@@ -73,6 +75,7 @@ public:
 class CardGame {
 private:
 	int level;
+	int startlevel;
 	bool isItem;
 	bool waiting = false;
 	RectangleShape box;
@@ -82,10 +85,13 @@ private:
 	vector<Card*> flippedCards;
 	Clock delayClock;
 	Clock clock;
+	RenderWindow& window;
 public:
-	CardGame(bool Item, int startlevel, RenderWindow& window)
-		: isItem(Item), level(startlevel)
+	CardGame(bool Item, int slevel, RenderWindow& renderWindow)
+		: isItem(Item), level(slevel), window(renderWindow)
 	{
+		startlevel = level;
+
 		if (!font.loadFromFile("HANDotum.ttf")) {
 			throw runtime_error("Font loading failed");
 		}
@@ -99,14 +105,13 @@ public:
 		text.setFont(font);
 		text.setCharacterSize(50);
 		text.setFillColor(Color::Black);
-		text.setString(L" Lv." + to_string(level));
+		text.setString(to_wstring(L" Lv." + to_string(level)));
 		text.setPosition(box.getPosition().x, 40.f);
 
 		setlevel(level);
-		showAllCards(window);
 		clock.restart();
 	}
-	void draw(RenderWindow& window) {
+	void draw() {
 		window.draw(text);
 		window.draw(box);
 		for (auto& card : cards) {
@@ -148,20 +153,22 @@ public:
 			cardImages.push_back(i);
 			cardImages.push_back(i);
 		}
-		random_shuffle(cardImages.begin(), cardImages.end());
+		shuffle(cardImages.begin(), cardImages.end(), default_random_engine(random_device{}()));
 		for (int i = 0; i < cardNumber; ++i) {
 			float x = startx + (i % colNumber) * (cardWidth + colpadding);
 			float y = starty + (i / colNumber) * (cardHeight + rowpadding);
 			cards.emplace_back(x, y, cardWidth, cardHeight, cardImages[i], isItem);
 		}
+
+		showAllCards();
 	}
-	void showAllCards(RenderWindow& window) {
+	void showAllCards() {
 		for (auto& card : cards)
 			card.flip();
 		window.clear();
-		draw(window);
+		draw();
 		window.display();
-		sf::sleep(sf::seconds(2));
+		sf::sleep(sf::seconds(1));
 		for (auto& card : cards)
 			card.flip();
 	}
@@ -185,7 +192,8 @@ public:
 						delayClock.restart();
 					}
 				}
-				cardCheck();
+				if(clock.getElapsedTime().asSeconds() <= 30)
+					cardCheck();
 				return;
 			}
 		}
@@ -199,25 +207,64 @@ public:
 			}
 		}
 		if(allMatched)
-			nextLevel();
+			GameOver(true);
 	}
 	void nextLevel() {
 		++level;
 		setlevel(level);
 	}
+	void GameOver(bool isClear) {
+		RenderWindow gameOverWindow(VideoMode(600, 400), isClear ? "Game Clear" : "Game Over");
+		gameOverWindow.setFramerateLimit(60);
+
+		Text message;
+		message.setFont(font);
+		message.setCharacterSize(40);
+		message.setFillColor(Color::Black);
+		message.setString(isClear ? L"Game Clear!" : L"Game Over..");
+		message.setPosition(gameOverWindow.getSize().x / 2.f - message.getLocalBounds().width / 2.f, 50.f);
+
+		Button next(50.f, 200.f, isClear? u8"다음 레벨" : u8"다시하기", Color(102, 204, 102));
+		Button home(250.f, 200.f, u8"취소", Color(192, 192, 192));
+
+		while (gameOverWindow.isOpen()) {
+			Event event;
+			while (gameOverWindow.pollEvent(event)) {
+				if (event.type == Event::Closed) {
+					gameOverWindow.close();
+					showHome();
+					return;
+				}
+				if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
+					Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
+					if (next.isClicked(mousePos)) {
+						gameOverWindow.close();
+						if (isClear)
+							nextLevel();
+						else
+							showGame(isItem, startlevel);
+						return;
+					}
+					else if (home.isClicked(mousePos)) {
+						gameOverWindow.close();
+						showHome();
+						return ;
+					}
+				}
+			}
+			gameOverWindow.clear(Color::White);
+			gameOverWindow.draw(message);
+			next.draw(gameOverWindow);
+			home.draw(gameOverWindow);
+			gameOverWindow.display();
+		}
+	}
 };
 
-void showGame(const wstring& mode, const wstring& level)
+void showGame(bool isItem, int startlevel)
 {
 	RenderWindow window(VideoMode(App::WIDTH, App::HEIGHT), "Card Game");
 	window.setFramerateLimit(60);
-
-	int startlevel;
-	if (level == L"쉬움") startlevel = 1;
-	else if (level == L"보통") startlevel = 5;
-	else startlevel = 9;
-	
-	bool isItem = (mode == L"아이템 카드");
 
 	CardGame cardGame = CardGame(isItem, startlevel, window);
 
@@ -235,7 +282,7 @@ void showGame(const wstring& mode, const wstring& level)
 			}
 		}
 		window.clear(Color::White);
-		cardGame.draw(window);
+		cardGame.draw();
 		window.display();
 	}
 }
