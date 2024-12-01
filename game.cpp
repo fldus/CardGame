@@ -109,7 +109,6 @@ public:
 		text.setPosition(box.getPosition().x, 40.f);
 
 		setlevel(level);
-		clock.restart();
 	}
 	void draw() {
 		window.draw(text);
@@ -161,11 +160,12 @@ public:
 		}
 
 		showAllCards();
+		clock.restart();
 	}
 	void showAllCards() {
 		for (auto& card : cards)
 			card.flip();
-		window.clear();
+		window.clear(Color::White);
 		draw();
 		window.display();
 		sf::sleep(sf::seconds(1));
@@ -174,6 +174,11 @@ public:
 	}
 	void cardClick(Vector2f mousePos) {
 		if (waiting) return;
+
+		if (clock.getElapsedTime().asSeconds() >= 30) {
+			GameOver(false);
+			return;
+		}
 
 		for (auto& card : cards) {
 			if (card.contains(mousePos) && !card.isMatched && !card.isFlipped) {
@@ -192,7 +197,7 @@ public:
 						delayClock.restart();
 					}
 				}
-				if(clock.getElapsedTime().asSeconds() <= 30)
+				if(clock.getElapsedTime().asSeconds() < 30)
 					cardCheck();
 				return;
 			}
@@ -206,8 +211,9 @@ public:
 				break;
 			}
 		}
-		if(allMatched)
+		if (allMatched) {
 			GameOver(true);
+		}
 	}
 	void nextLevel() {
 		++level;
@@ -222,16 +228,17 @@ public:
 		message.setCharacterSize(40);
 		message.setFillColor(Color::Black);
 		message.setString(isClear ? L"Game Clear!" : L"Game Over..");
-		message.setPosition(gameOverWindow.getSize().x / 2.f - message.getLocalBounds().width / 2.f, 50.f);
+		message.setPosition(gameOverWindow.getSize().x / 2.f - message.getLocalBounds().width / 2.f, 100.f);
 
-		Button next(50.f, 200.f, isClear? u8"다음 레벨" : u8"다시하기", Color(102, 204, 102));
-		Button home(250.f, 200.f, u8"취소", Color(192, 192, 192));
+		Button next(80.f, 250.f, isClear? u8"다음 레벨" : u8"다시하기", Color(102, 204, 102));
+		Button home(320.f, 250.f, u8"취소", Color(192, 192, 192));
 
 		while (gameOverWindow.isOpen()) {
 			Event event;
 			while (gameOverWindow.pollEvent(event)) {
 				if (event.type == Event::Closed) {
 					gameOverWindow.close();
+					window.close();
 					showHome();
 					return;
 				}
@@ -241,12 +248,14 @@ public:
 						gameOverWindow.close();
 						if (isClear)
 							nextLevel();
-						else
+						else {
+							window.close();
 							showGame(isItem, startlevel);
+						}
 						return;
-					}
-					else if (home.isClicked(mousePos)) {
+					}else if (home.isClicked(mousePos)) {
 						gameOverWindow.close();
+						window.close();
 						showHome();
 						return ;
 					}
