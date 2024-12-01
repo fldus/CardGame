@@ -72,27 +72,42 @@ public:
 
 class CardGame {
 private:
-	bool isItem;
 	int level;
+	bool isItem;
+	bool waiting = false;
 	RectangleShape box;
+	Text text;
+	Font font;
 	vector<Card> cards;
 	vector<Card*> flippedCards;
 	Clock delayClock;
-	bool waiting = false;
+	Clock clock;
 public:
 	CardGame(bool Item, int startlevel, RenderWindow& window)
 		: isItem(Item), level(startlevel)
 	{
+		if (!font.loadFromFile("HANDotum.ttf")) {
+			throw runtime_error("Font loading failed");
+		}
+
 		box.setSize({ Box::Width, Box::Height });
 		box.setFillColor(Color::White);
 		box.setOutlineThickness(2.f);
 		box.setOutlineColor(Color::Black);
 		box.setPosition(App::WIDTH / 2 - Box::Width / 2, App::HEIGHT / 2 - 250.f);
 
+		text.setFont(font);
+		text.setCharacterSize(50);
+		text.setFillColor(Color::Black);
+		text.setString(L" Lv." + to_string(level));
+		text.setPosition(box.getPosition().x, 40.f);
+
 		setlevel(level);
 		showAllCards(window);
+		clock.restart();
 	}
 	void draw(RenderWindow& window) {
+		window.draw(text);
 		window.draw(box);
 		for (auto& card : cards) {
 			card.draw(window);
@@ -112,6 +127,7 @@ public:
 		return 4 + 2 * (level - 1);
 	}
 	void setlevel(int level) {
+		text.setString(L" Lv." + to_string(level));
 		cards.clear();
 
 		int cardNumber = cardCount(level);
@@ -169,9 +185,21 @@ public:
 						delayClock.restart();
 					}
 				}
+				cardCheck();
 				return;
 			}
 		}
+	}
+	void cardCheck() {
+		bool allMatched = true;
+		for (auto& card : cards) {
+			if (!card.isMatched) {
+				allMatched = false;
+				break;
+			}
+		}
+		if(allMatched)
+			nextLevel();
 	}
 	void nextLevel() {
 		++level;
