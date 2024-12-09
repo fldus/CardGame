@@ -11,7 +11,7 @@
 using namespace sf;
 using namespace std;
 
-// Render window 화면 너비와 높이를 정의
+// Render window 화면 너비와 높이
 enum App
 {
 	WIDTH = 600, HEIGHT = 500
@@ -45,6 +45,7 @@ public:
 		// 옵션이 비어있을 경우 예외 처리
 		if (optionText.empty())
 			throw invalid_argument("Option list cannot be empty");
+
 		// font load + 예외 처리
 		if (!font.loadFromFile("HANDotum.ttf")) {
 			throw runtime_error("Font loading failed");
@@ -116,7 +117,7 @@ public:
 		if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
 			// 드롭다운 박스를 클릭했을 때 
 			if (box.getGlobalBounds().contains(mousePos)) {
-				isOpen = !isOpen;	// 드롭다운 상태 토글
+				isOpen = !isOpen;
 			}
 			// 드롭다운 열려 있을 때 
 			else if (isOpen) 
@@ -124,10 +125,11 @@ public:
 				for (size_t i = 0; i < options.size(); ++i) {
 						// 각 옵션 박스를 클릭했을 때 
 					if (optionBoxes[i].getGlobalBounds().contains(mousePos)) {
-						selectedIndex = i;	// 선택 인덱스 없데이트
-						label.setString(options[i].getString());	// 선택 옵션 레이블 업데이트
+						// 선택 옵션 업데이트
+						selectedIndex = i;
+						label.setString(options[i].getString());
 						isOpen = false;	// 드롭다운 닫기
-						break;	// 클릭된 옵션 처리 후 반복 종료
+						break;
 					}
 				}
 			}
@@ -142,7 +144,6 @@ public:
 
 // 버튼 클래스 정의
 Button::Button(float x, float y, string str, Color color) {
-	// 버튼 위치, 크기, 색상 설정
 	shape.setPosition(x, y);
 	shape.setSize({ Width, Height });	
 	shape.setFillColor(color);
@@ -157,7 +158,6 @@ Button::Button(float x, float y, string str, Color color) {
 	text.setCharacterSize(25);
 	text.setString(to_wstring(str));
 	text.setFillColor(Color::Black);
-	// 텍스트 중심으로 위치 조절
 	text.setOrigin(text.getGlobalBounds().width / 2.f, text.getGlobalBounds().height / 1.4f);
 	text.setPosition(
 		shape.getPosition().x + (shape.getSize().x / 2.f),	// 중앙에 텍스트 정렬
@@ -165,12 +165,11 @@ Button::Button(float x, float y, string str, Color color) {
 }
 // 버튼 그리는 함수
 void Button::draw(RenderWindow& window) {
-	window.draw(shape);	// 버튼 모양 
-	window.draw(text);	// 버튼 텍스트 
+	window.draw(shape); 
+	window.draw(text); 
 }
 // 버튼 클릭 여부를 확인하는 함수
 bool Button::isClicked(Vector2f mousePos) {
-	// 클릭된 위치가 버튼 영역 내에 있는지 확인
 	return shape.getGlobalBounds().contains(mousePos);
 }
 

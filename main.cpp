@@ -1,4 +1,3 @@
-// main.h
 #include "home.h"
 
 int main()

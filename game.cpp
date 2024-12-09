@@ -10,12 +10,12 @@
 using namespace sf;
 using namespace std;
 
-// Render window의 너비와 높이를 정의
+// Render window의 너비와 높이
 enum App
 {
 	WIDTH = 1100, HEIGHT = 800
 };
-// 카드 배치 박스의 너비와 높이를 정의
+// 카드 배치 박스의 너비와 높이
 enum Box
 {
 	Width = 900, Height = 600
@@ -58,15 +58,15 @@ public:
 
 		// 카드 모양 (뒷면 = 흰색, 앞면 = 이미지)
 		shape.setSize({ width, height });
-		shape.setFillColor(Color::White);	// 뒤집힌 상태
+		shape.setFillColor(Color::White);
+		shape.setTexture(nullptr);	// 텍스쳐 제거
 		shape.setOutlineThickness(2.5f);
 		shape.setOutlineColor(Color::Black);
 		shape.setPosition(x, y);
-		shape.setTexture(nullptr);	// 텍스쳐 제거
 	}
 	// 카드 그리는 함수
 	void draw(RenderWindow& window) {
-		window.draw(shape);	// 카드 모양 그리기
+		window.draw(shape);
 	}
 	// 카드 뒤집는 함수
 	void flip() {
@@ -82,7 +82,6 @@ public:
 	}
 	// 각 카드 클릭 여부 확인 함수
 	bool contains(Vector2f point) {
-		// 카드가 클릭되었는지 확인
 		return shape.getGlobalBounds().contains(point);
 	}
 };
@@ -156,6 +155,7 @@ public:
 		float timerWidth = timerBox.getSize().x * (remindTime / 30.f);
 		// 타이머가 타이머 박스 초과하지 않도록 제한
 		if (timerWidth > timerBox.getSize().x) timerWidth = timerBox.getSize().x;
+		
 		// 제한 시간이 끝나면 게임 종료
 		if (remindTime < 0) {
 			GameOver(false);
@@ -227,8 +227,8 @@ public:
 
 		// 박스 위치 가져오기
 		Vector2f boxPos = box.getPosition();
-		float startx = boxPos.x + colpadding;	// 시작 x 위치
-		float starty = boxPos.y + rowpadding;	// 시작 y 위치
+		float startx = boxPos.x + colpadding;
+		float starty = boxPos.y + rowpadding;
 
 		// 카드 이미지 인덱스 저장
 		vector<int> cardImages;
@@ -242,7 +242,7 @@ public:
 			// 카드 위치 계산
 			float x = startx + (i % colNumber) * (cardWidth + colpadding);
 			float y = starty + (i / colNumber) * (cardHeight + rowpadding);
-			// 카드 추기
+			// 카드 추가
 			cards.emplace_back(x, y, cardWidth, cardHeight, cardImages[i], isItem);
 		}
 		// 모든 카드 보여주는 함수 호출
@@ -288,13 +288,13 @@ public:
 				if (flippedCards.size() == 2) {
 					waiting = true;	// 대기 상태로 설정
 					if (flippedCards[0]->card_img == flippedCards[1]->card_img) {
-						// 아이템 카드가 heart.png일 때 
+						// 아이템 카드가 heart.png일 때 제한 시간 5초 추가
 						if (isItem && flippedCards[0]->card_img == 0) {
-							remindTime += 5;	// 제한 시간 5초 추가
+							remindTime += 5;
 						}
-						// 아이템 카드가 bomb.png일 때
+						// 아이템 카드가 bomb.png일 때 제한 시간 5초 감소
 						else if (isItem && flippedCards[0]->card_img == 3) {
-							remindTime -= 5;	// 제한 시간 5초 감소
+							remindTime -= 5;
 						}
 						// 카드 매칭 처리
 						flippedCards[0]->isMatched = true;
@@ -303,7 +303,6 @@ public:
 						cnt += 2;	// 뒤집은 카드 수 (점수) 증가
 						waiting = false;	// 대기 상태 헤제
 					}
-					// 카드가 일치하지 않을 때
 					else {
 						// 카드 뒤집기 대기 타이머 초기화
 						delayClock.restart();
@@ -313,7 +312,6 @@ public:
 				if(remindTime > 0)
 					cardCheck();
 
-				// 클릭 처리 종료
 				return;
 			}
 		}
@@ -322,10 +320,10 @@ public:
 	void cardCheck() {
 		bool allMatched = true;	// 모든 카드 매칭 여부 초기화
 		for (auto& card : cards) {
-			// 매칭 되지 않은 카드가 있으면 
+			// 매칭 되지 않은 카드가 있으면 매칭 상태 업데이트
 			if (!card.isMatched) {
-				allMatched = false; // 매칭 상태 업데이트
-				break;	// 반복 종료
+				allMatched = false;
+				break;
 			}
 		}
 		// 모든 카드 매칭된 경우 게임 종료(게임 클리어)
@@ -353,8 +351,8 @@ public:
 		message.setPosition(gameOverWindow.getSize().x / 2.f - message.getLocalBounds().width / 2.f, 100.f);
 
 		// 다음 레벨 / 다시하기, 취소 버튼 생성
-		Button next(80.f, 250.f, isClear? u8"다음 레벨" : u8"다시하기", Color(102, 204, 102));
-		Button home(320.f, 250.f, u8"취소", Color(192, 192, 192));
+		Button next(320.f, 250.f, isClear? u8"다음 레벨" : u8"다시하기", Color(102, 204, 102));
+		Button home(80.f, 250.f, u8"종료하기", Color(240, 100, 100));
 
 		// 게임 오버 창이 열려 있는 동안
 		while (gameOverWindow.isOpen()) {
@@ -370,7 +368,6 @@ public:
 				}
 				// 마우스 클릭 이벤트 처리
 				if (event.type == Event::MouseButtonPressed && event.mouseButton.button == Mouse::Left) {
-					// 마우스 위치
 					Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
 					// 다음 레벨 / 다시하기 버튼 클릭했을 때
 					if (next.isClicked(mousePos)) {

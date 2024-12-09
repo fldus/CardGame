@@ -6,7 +6,7 @@
 using namespace sf;
 using namespace std;
 
-// Render window 창 너비와 높이를 정의
+// Render window 창 너비와 높이
 enum App	
 {
 	WIDTH = 900, HEIGHT = 700
@@ -24,8 +24,8 @@ Record::Record(float x, float y, string mode, string slevel)
 	cardMode.setCharacterSize(30);
 	cardMode.setString(to_wstring(mode));
 	cardMode.setFillColor(Color::Black);
-	cardMode.setPosition(x, y);	// 텍스트 위치 설정
-	cardMode.setOrigin(	// 텍스트 중심 설정
+	cardMode.setPosition(x, y);
+	cardMode.setOrigin(	
 		cardMode.getGlobalBounds().width / 2.f,
 		cardMode.getGlobalBounds().height / 2.f);
 
@@ -34,7 +34,7 @@ Record::Record(float x, float y, string mode, string slevel)
 	startlevel.setCharacterSize(30);
 	startlevel.setString(to_wstring(slevel));
 	startlevel.setFillColor(Color::Black);
-	startlevel.setPosition(x+170.f, y);	// 위치 조정
+	startlevel.setPosition(x+170.f, y);
 	startlevel.setOrigin(
 		startlevel.getGlobalBounds().width / 2.f, 
 		startlevel.getGlobalBounds().height / 2.f);
@@ -44,22 +44,20 @@ Record::Record(float x, float y, string mode, string slevel)
 	text.setCharacterSize(30);
 	text.setString("Lv." + to_string(level) + "        " + to_string(score));	
 	text.setFillColor(Color::Black);
-	text.setPosition(x+365.f, y);	// 위치 조정
+	text.setPosition(x+365.f, y);
 	text.setOrigin(
 		text.getGlobalBounds().width / 2.f,
 		text.getGlobalBounds().height / 2.f);
 }
-// Record 정보를 화면에 그리는 함수
 void Record::draw(RenderWindow& window) {
-	window.draw(cardMode);	// 카드 모드 텍스트
-	window.draw(startlevel);	// 난이도 텍스트
-	window.draw(text);	// 최고 기록 레벨, 점수 텍스트
+	window.draw(cardMode);	// 카드 모드
+	window.draw(startlevel);	// 난이도
+	window.draw(text);	// 최고 기록 레벨, 점수
 }
-// 최고 기록 레벨, 점수 업데이트하는 함수
 void Record::update(int l, int s) {
 	// 레벨 기준으로 업데이트
 	if (level < l) {
-		level = l; score = s;	// 레벨, 점수 업그레이드
+		level = l; score = s;
 	}
 	else if (level == l && score < s) {
 		score = s;	// 점수 업그레이드
@@ -70,7 +68,7 @@ void Record::update(int l, int s) {
 // 게임 최고 기록 (제목, 목록) + 게임 시작 버튼 정의하는 클래스
 class Start {
 private:
-	RectangleShape box;	// 게임 최고 기록 배경
+	RectangleShape box;	// 게임 최고 기록
 	RectangleShape shape;	// 게임 시작 버튼
 	const float StartButtonWidth = 600.f;
 	const float StartButtonHeight = 100.f;
@@ -126,15 +124,16 @@ public:
 	}
 	// 게임 최고 기록 + 시작 버튼 그리기
 	void draw(RenderWindow& window) {
-		window.draw(box);	// 게임 최고 기록 배경
-		window.draw(title);	// 게임 최고 기록 제목
-		window.draw(label);	// 게임 최고 기록 목록
-		window.draw(shape);	// 게임 시작 버튼
-		window.draw(start);	// 게임 시작 버튼 텍스트
+		// 게임 최고 기록
+		window.draw(box);
+		window.draw(title);	
+		window.draw(label);
+		// 게임 시작 버튼
+		window.draw(shape);	
+		window.draw(start);
 	}
 	// 시작 버튼 클릭 여부를 확인하는 메서드
 	bool isClicked(Vector2f mousePos) {
-		// 마우스가 버튼을 클릭했는지 확인
 		return shape.getGlobalBounds().contains(mousePos);
 	}
 };
@@ -154,7 +153,8 @@ void showHome()
 	// 초당 프레임 조절(컴퓨터 성능과 상관없이 일정한 속도)
 	window.setFramerateLimit(60);
 
-	Start sbutton(App::WIDTH / 2, (App::HEIGHT / 3) * 2);	// 시작 버튼 위치 설정
+	// 시작 버튼 위치 설정
+	Start sbutton(App::WIDTH / 2, (App::HEIGHT / 3) * 2);
 
 	while (window.isOpen())
 	{
@@ -176,9 +176,9 @@ void showHome()
 		}
 		// 화면 초기화
 		window.clear(Color::White);
-		// 게임 최고 기록 + 시작 버튼 그리기
+		// 시작 버튼 그리기
 		sbutton.draw(window);
-		// Render 정보 그리기
+		// 게임 최고 기록 그리기
 		be.draw(window);	
 		bc.draw(window);
 		bh.draw(window);
